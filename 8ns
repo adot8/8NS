@@ -1,0 +1,84 @@
+#!/bin/bash
+# Please use responsibly :D
+
+if [ "$#" -ne 2 ]; then
+    echo 
+    echo 8NS | figlet
+    echo "          adot8 <3"
+    echo
+    echo "Usage: 8NS <domain> <subdomain_wordlist>"
+    exit 1
+fi
+
+#Set variable
+domain=$1
+wordlist=$2
+
+echo
+echo 8NS | figlet 
+echo "      adot8 <3"
+
+if [ ! -d "$domain" ];then
+	mkdir $domain
+fi
+
+if [ ! -d "$domain/dns" ];then
+	mkdir $domain/dns/
+fi
+
+echo
+echo -e "\e[34m[+]\e[0m Discovering subdomains"
+sleep 2
+curl -s https://crt.sh/\?q\=$domain\&output\=json | jq . | grep name | cut -d":" -f2 | grep -v "CN=" | cut -d'"' -f2 | awk '{gsub(/\\n/,"\n");}1;' | sort -u > $domain/dns/"$domain"_sub.raw
+assetfinder $domain | sort -u >> $domain/dns/"$domain"_sub.raw
+cat $domain/dns/"$domain"_sub.raw | sort -u > $domain/dns/"$domain"_sub2.raw
+cat $domain/dns/"$domain"_sub2.raw | grep -v '^$' | grep "$domain" > $domain/dns/"$domain"_subdomains.lst
+cat $domain/dns/"$domain"_subdomains.lst
+echo
+sleep 2
+
+echo -e "\e[34m[+]\e[0m Enumerating possible subdomain takeovers"
+sleep 2
+subjack -w  $domain/dns/"$domain"_subdomains.lst -ssl -c ~/fingerprints.json -v 3 -a -o $domain/dns/"$domain"_subdomains_takeovers.lst
+echo
+
+
+echo -e "\e[34m[+]\e[0m Enumerating DMARC DKIM and SPF"
+sleep 2
+dss scan $domain -a -o $domain/dns/"$domain"_dmarc
+cat $domain/dns/"$domain"_dmarc.yaml
+echo
+sleep 2
+
+echo -e "\e[34m[+]\e[0m Performing comprehensive DNS recon"
+sleep 2
+dnsenum --enum $domain -r --noreverse --threads 10 -f $wordlist -o $domain/dns/"$domain"_comprehensive.txt
+echo
+sleep 2
+
+echo -e "\e[34m[+]\e[0m Mapping IP addresses to subdomains"
+sleep 2
+for i in $(cat $domain/dns/"$domain"_subdomains.lst);do host $i | grep "has address" | grep $domain | cut -d" " -f4 >>  $domain/dns/"$domain"_ips.lst;done
+cat  $domain/dns/"$domain"_ips.lst
+echo
+sleep 2
+
+echo -e "\e[34m[+]\e[0m Enumerating IP addresses via Shodan"
+sleep 2
+shodan domain $domain > $domain/dns/"$domain"_shodan.txt
+for i in $(cat $domain/dns/"$domain"_ips.lst);do shodan host $i;done >  $domain/dns/"$domain"_shodanIPs.txt
+cat  $domain/dns/"$domain"_shodan.txt
+echo
+sleep 2
+
+
+echo -e "\e[34m[+]\e[0m Enumerating subdomains contents via eyewitness"
+sleep 2
+eyewitness --web -f  $domain/dns/"$domain"_subdomains.lst -d  $domain/dns/"$domain"_eyewitness
+firefox $(pwd)/$domain/dns/"$domain"_eyewitness/report.html
+echo
+mv "$domain"_ips.txt > $domain/dns/"$domain"_ips_dnsenum.txt
+sleep 2
+
+
+echo -e "\e[34m[+]\e[0m Happy digging!"
