@@ -78,6 +78,7 @@ eyewitness --web -f  $domain/dns/"$domain"_subdomains.lst -d  $domain/dns/"$doma
 firefox $(pwd)/$domain/dns/"$domain"_eyewitness/report.html
 echo
 mv "$domain"_ips.txt > $domain/dns/"$domain"_ips_dnsenum.txt
+rm gecko*
 sleep 2
 
 
