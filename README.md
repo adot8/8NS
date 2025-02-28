@@ -14,6 +14,7 @@ sudo apt update && sudo apt -y install assetfinder dnsenum eyewitness && pip3 in
 git clone https://github.com/globalcyberalliance/domain-security-scanner.git
 cd domain-security-scanner
 make
+sudo cp dss /bin
 ```
 
 ```bash
