@@ -18,12 +18,12 @@ sudo cp dss /bin
 ```
 
 ```bash
-git clone https://github.com/adot8/8NS.git && cd 8NS && chmod +x 8NS && sudo cp 8ns /bin
+git clone https://github.com/adot8/8NS.git && cd 8ns && chmod +x 8NS && sudo cp 8ns /bin
 ```
 
 ## Usage
 ```bash
-8NS <domain> <subdomain_wordlist>
+8ns <domain> <subdomain_wordlist>
 
-8NS adot8.com /opt/wordlists/subdomains_custom.txt
+8ns adot8.com /opt/wordlists/subdomains_custom.txt
 ```
