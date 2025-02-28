@@ -5,9 +5,24 @@ Not inventing the wheel with this one.
 
 This tool has been very useful on engagements, as it can be ran in the background while other manual recon tactics are performed.
 
+## Installation
+```bash
+sudo apt update && sudo apt -y install assetfinder dnsenum eyewitness && pip3 install shodan
+```
+
+```bash
+git clone https://github.com/globalcyberalliance/domain-security-scanner.git
+cd domain-security-scanner
+make
+```
+
+```bash
+git clone https://github.com/adot8/8NS.git && cd 8NS && chmod +x 8NS && sudo cp 8ns /bin
+```
+
 ## Usage
-`git clone https://github.com/adot8/8NS.git`
+```bash
+8NS <domain> <subdomain_wordlist>
 
-`cd 8NS && chmod +x 8NS`
-
-`./8NS <domain> <subdomain_wordlist> `
+8NS adot8.com /opt/wordlists/subdomains_custom.txt
+```
